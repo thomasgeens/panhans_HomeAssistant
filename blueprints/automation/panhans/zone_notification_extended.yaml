@@ -1,5 +1,5 @@
 blueprint:
-  name: Zone Notification Extended
+  name: Zone Notification Extended (Fork - notify entity fix)
   description: >
 
     ✉️ notification when a person enters / leaves a zone
@@ -19,20 +19,39 @@ blueprint:
     If you want to test this automation, you need to change the state of an observed person. you can do this, in the developer options. Simply filter for your person entity, click on it and change the state to a zone used by this automation.
 
 
-    **Version**: 3.5.3
+    **Version**: 3.5.3-fork1 (based on upstream 3.5.3)
 
     **Help & FAQ**: [Zone Notification Extended](https://community.home-assistant.io/t/zone-notification-extended)
 
 
-    If you like my work and support feel free to support me.
+    ### Fork notes (local fix)
 
-    [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Q5Q3QEH52)
-    <a href="https://www.paypal.com/donate/?hosted_button_id=ZQ333L4BA3YLU">
-      <img src="https://raw.githubusercontent.com/andreostrovsky/donate-with-paypal/refs/heads/master/blue.svg"
-          width="200" alt="Donate with PayPal">
-    </a>
+    This is a local fork of the original blueprint by panhans, patched to fix an
+    `action <notify_group> does not exist` error that occurs when the
+    **Notification Group** input points to a modern Home Assistant *notify group
+    helper entity* (Settings → Devices & services → Helpers → Group, "Notify"
+    type), e.g. `notify.iedereen`.
+
+    The upstream blueprint always calls the notify target as a legacy flat
+    service (`notify.<group>`). That still works for classic `mobile_app_xxx`
+    targets and for notify groups defined the old way in `configuration.yaml`,
+    but it does **not** work for entity-based notify group helpers created via
+    the UI, because those are only exposed as an entity, not as a standalone
+    flat service.
+
+    This fork checks at runtime whether the resolved notify target exists as an
+    entity. If it does, it calls the modern `notify.send_message` action with
+    `target: entity_id:`. If it does not (legacy flat service), it falls back to
+    calling the flat service exactly like upstream, so existing setups keep
+    working unchanged.
+
+    Original: https://github.com/thomasgeens/panhans_HomeAssistant/blob/main/blueprints/automation/panhans/zone_notification_extended.yaml
+
+
+    If you like the original author's work and want to support them, see the
+    original blueprint link above.
     
-  source_url: "https://github.com/panhans/homeassistant/blob/main/blueprints/automation/panhans/zone_notification_extended.yaml"
+  source_url: "https://github.com/thomasgeens/panhans_HomeAssistant/blob/main/blueprints/automation/panhans/zone_notification_extended.yaml"
   domain: automation
   homeassistant:
     min_version: 2023.8.0
